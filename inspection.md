@@ -13,7 +13,9 @@ Unless otherwise specified, list the command and all arguments that you passed t
 
 ## Setup Instructions
 1. Build the workspace using colcon build --symlink-install so that it is unnecessary to rebuild when python files change.
-2. Initialize the ROS environment (i.e., set the necessary ROS environment variables) by executing echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+2. Initialize the ROS environment (i.e., set the necessary ROS environment variables) by executing:
+      echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+      . install/local_setup.bash
 3. Make sure no other ROS nodes are running prior to starting.
 3. Run the launchfile `go_crazy_turtle.launch.xml` by executing ros2 launch crazy_turtle launch
 4. When running you can see a visual depiction of the ROS graph using the ros2 run rqt_graph rqt_graph command.
@@ -25,7 +27,7 @@ Unless otherwise specified, list the command and all arguments that you passed t
 The `launchfile` from above should be running at all times when executing these commands.
 If the nodes launched from the `launchfile` are not running, you will get incorrect results.
 
-5. Use the ROS command `${command and args}` to list all the nodes that are running.
+5. Use the ROS command ros2 node list to list all the nodes that are running.
    The output of the command looks like
    ```
    ${list nodes here}
