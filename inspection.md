@@ -6,19 +6,20 @@ exercise. Replace the blanks marked with `${ITEM}` with your answer.
 Unless otherwise specified, list the command and all arguments that you passed to it.
 
 ## Repository Configuration
-1. The `crazy_turtle` git repository consists of the ROS 2 packages ${pkg_name1} and ${pkg_name2}
-2. The package ${pkg_name1} is a ${build type of package} package because ${when/why would you use this type of package}
-2. The package ${pkg_name2} is a ${build type of package} package because ${when/why would you use this type of package}
+1. The `crazy_turtle` git repository consists of the ROS 2 packages crazy_turtle and crazy_turtle_interfaces
+2. The package crazy_turtle is a ament_python package because this package is only implementing python code.
+2. The package crazy_turtle_interfaces is a ament_cmake package because this package is only implementing C/C++ code.
 
 
 ## Setup Instructions
-1. Build the workspace using `${insert command here}` so that it is unnecessary to rebuild when python files change.
-2. Initialize the ROS environment (i.e., set the necessary ROS environment variables) by executing `${insert command here}`
+1. Build the workspace using colcon build --symlink-install so that it is unnecessary to rebuild when python files change.
+2. Initialize the ROS environment (i.e., set the necessary ROS environment variables) by executing echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 3. Make sure no other ROS nodes are running prior to starting.
-3. Run the launchfile `go_crazy_turtle.launch.xml` by executing `${insert command here}`
-4. When running you can see a visual depiction of the ROS graph using the `${command}` command.
+3. Run the launchfile `go_crazy_turtle.launch.xml` by executing ros2 launch crazy_turtle launch
+4. When running you can see a visual depiction of the ROS graph using the ros2 run rqt_graph rqt_graph command.
    The ROS graph, including all topics and node labels, looks like:
    ![The ROS Graph](${export svg image, add it to repository, put path here so it displays in the README.md})
+   ~/ME_495/HWws/src/homework1/rosgraph_part1_setup.svg
 
 ## Runtime Information
 The `launchfile` from above should be running at all times when executing these commands.
