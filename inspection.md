@@ -15,7 +15,7 @@ Unless otherwise specified, list the command and all arguments that you passed t
 1. Build the workspace using `colcon build --symlink-install` so that it is unnecessary to rebuild when python files change.
 2. Initialize the ROS environment (i.e., set the necessary ROS environment variables) by executing:
       `echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc`
-      `. install/local_setup.bash`
+      `source install/setup.bash `
 3. Make sure no other ROS nodes are running prior to starting.
 3. Run the launchfile `go_crazy_turtle.launch.xml` by executing `ros2 launch crazy_turtle go_crazy_turtle.launch.xml`
 4. When running you can see a visual depiction of the ROS graph using the ros2 run rqt_graph rqt_graph command.
@@ -148,8 +148,8 @@ If the nodes launched from the `launchfile` are not running, you will get incorr
 3. The `switch` service performs the following actions (in sequence):
     1. It `deletes` the current turtle
     2. It then respawns a new turtle at `(x=(y+angular_velocity), y=(x*linear_velocity)`
-4. What happens to the turtle's motion if you use `ros2 param set /mover velocity 10` to change `/mover velocity` to 10? same
-5. Use the Linux command `${command and args}` to kill the `/mover` node.
-6. Use the ROS command `${command and args}` to start the `/mover` node with a velocity of 10. 
+4. What happens to the turtle's motion if you use `ros2 param set /mover velocity 10` to change `/mover velocity` to 10? `same`
+5. Use the Linux command `pkill mover` to kill the `/mover` node.
+6. Use the ROS command `ros2 run crazy_turtle mover --ros-args -r /cmd_vel:=/turtle1/cmd_vel -p velocity:=10.0` to start the `/mover` node with a velocity of 10. 
     - Be sure to remap `cmd_vel` to `/turtle1/cmd_vel`.
-7. What happened to the turtle's velocity after relaunching `mover`? `${faster | slower | same}`
+7. What happened to the turtle's velocity after relaunching `mover`? `faster`
