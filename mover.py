@@ -10,7 +10,7 @@ SERVICES:
   + /switch (Switch) - Position of the new turtle
 
 PARAMETERS:
-  + /velocity (double_value) - Velocity driving the robot
+  + velocity (double_value) - Velocity driving the robot
 
 """
 
