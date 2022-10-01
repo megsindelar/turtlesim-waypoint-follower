@@ -45,7 +45,6 @@ class Waypoint(Node):
         self.pen = self.create_client(SetPen, "turtle1/set_pen")
         """Publish positions for turtle to move"""
        # self.move = self.create_publisher(Twist, "")
-        self.F1 = 0
 
        # if not self.reset.wait_for_service(timeout_sec=1.0):
        #     raise RuntimeError('Timeout waiting for "spawn" service to become available')
@@ -90,9 +89,18 @@ class Waypoint(Node):
     def draw_x(self, points):
         i = 0
         while i < (len(points))-1:
-            #self.pen_future = self.pen.call_async(SetPen.Request(r = 255, g = 0, b = 0, width = 1, off = True))
-            #if self.pen_future.done():
+            self.pen_future = self.pen.call_async(SetPen.Request(off = 1))
             self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = self.points[i].x, y = self.points[i].y, theta = uniform(-pi, pi)))
+            
+            #draw x
+            # self.pen_future = self.pen.call_async(SetPen.Request(off = 0))
+            # self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.25), y = (self.points[i].y + 0.25)))
+            # self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.5), y = (self.points[i].y - 0.5)))
+            # self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.25), y = (self.points[i].y + 0.25)))
+            # self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.25), y = (self.points[i].y + 0.25)))
+            # self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.5), y = (self.points[i].y - 0.5)))
+            # self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.25), y = (self.points[i].y + 0.25)))
+            
             i += 1
             sleep(1)
         self.get_logger().info("draw x") 
