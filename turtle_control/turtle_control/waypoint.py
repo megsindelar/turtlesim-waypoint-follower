@@ -1,3 +1,4 @@
+from cgitb import reset
 import re
 from urllib import request
 from enum import Enum, auto
@@ -5,26 +6,26 @@ import std_srvs
 from std_srvs.srv import Empty
 import rclpy
 from rclpy.node import Node
-from turtlesim.srv import Spawn, Kill, TeleportAbsolute
+from turtlesim.srv import TeleportAbsolute, SetPen
 from turtle_interfaces.srv import Waypoints
+from geometry_msgs.msg import Twist
+from random import uniform
+from math import pi
+import numpy as np
 
 class State(Enum):
     """States of program"""
     MOVING = auto(),
-    STOPPED = auto()
-
-class Turtle(Enum):
-    """States for turtlesim reset and turtle teleporting"""
+    STOPPED = auto(),
     RESET = auto(),
     TELEPORT = auto()
+
 
 class Waypoint(Node):
     def __init__(self):
         super().__init__("waypoint")
         """Initialize state to be stopping"""
         self.state = State.STOPPED
-        self.stopped = 1
-        self.turtle = Turtle.SPAWNING
         """Declare a frequency parameter for timer callback"""
         self.declare_parameter("frequency", 0.01)
         self.frequency = self.get_parameter("frequency").get_parameter_value().double_value
@@ -34,39 +35,18 @@ class Waypoint(Node):
         self.load = self.create_service(Waypoints, "load", self.load_callback)
         """Timer that runs at 100 Hz"""
         self.timer = self.create_timer(self.frequency, self.timer_callback)
-        """Create a client to spawn turtle in new location"""
-        self.spawn = self.create_client(Spawn, "spawn")
-        """Create a client to kill a turtle"""
-        self.kill = self.create_client(Kill, "kill")
         """Client for resetting the turtle in turtlesim"""
         self.reset = self.create_client(Empty, "reset")
         """Client for teleporting turtle in turtlesim"""
-        self.teleport = self.create_client(TeleportAbsolute, "teleport")
+        self.teleport = self.create_client(TeleportAbsolute, "TeleportAbsolute")
+        """Client for turtlesim pen to draw an X at each waypoint"""
+        self.pen = self.create_client(SetPen, "setpen")
+        """Publish positions for turtle to move"""
+       # self.move = self.create_publisher(Twist, "")
 
-        if not self.kill.wait_for_service(timeout_sec=1.0):
-            raise RuntimeError('Timeout waiting for "kill" service to become available')
+       # if not self.reset.wait_for_service(timeout_sec=1.0):
+       #     raise RuntimeError('Timeout waiting for "spawn" service to become available')
 
-        if not self.spawn.wait_for_service(timeout_sec=1.0):
-            raise RuntimeError('Timeout waiting for "spawn" service to become available')
-
-        if not self.reset.wait_for_service(timeout_sec=1.0):
-            raise RuntimeError('Timeout waiting for "spawn" service to become available')
-
-    
-    """Timer function that runs at 100 Hz"""
-    def timer_callback(self):    
-        if self.state == State.MOVING:
-            """Send to debug logger that you are issuing a command as long as it is moving"""
-            self.get_logger().debug("Issuing Command!")
-            self.stopped = 0
-        elif (self.state == State.STOPPED) and self.stopped == 0:
-            """When stopping, tell the debug logger once"""
-            self.get_logger().debug("Stopping")
-            self.stopped = 1
-        else:
-            """If already stopped and told debug logger, then print nothing"""
-            self.get_logger().debug("")
-        print(f'State: {self.state}')
 
     """Service callback function for toggling states"""
     def toggle_callback(self, request, response):
@@ -76,13 +56,8 @@ class Waypoint(Node):
         else:
             """If toggle is called, switch state from moving to stopped"""
             self.state = State.STOPPED
+            self.get_logger().debug("Stopping")
         return response
-
-    def reset_turtlesim(self):
-        self.reset_future = self.reset.call_async()
-
-    def teleport(self):
-        self.teleport_future = 
 
     def load_callback(self, request, response):
         """ Callback function for the /load service
@@ -90,26 +65,44 @@ class Waypoint(Node):
             Resets the turtlesim node to its initial state and creates waypoints at those locations,
             then the turtle moves to each waypoint and calculates the total linear distance traveled
         """
+        self.state = State.RESET
+        self.points = request.points
+        self.reset_future = self.reset.call_async(Empty.Request())
+        i = 0
+        self.total_dist = 0.0
+        while i < len(self.points):
+            self.diff_x = self.points[i+1].x - self.points[i].x
+            self.diff_y = self.points[i+1].y - self.points[i].y
 
-        if self.state == State.STOPPED:
-            self.reset_turtlesim()
-            self.state = State.MOVING
-        else:
-            
+            #teleport
+            #self.teleport_future = self.teleport.call(TeleportAbsolute.Request(x = self.points[i].x, y = self.points[i].y, theta = uniform(-pi, pi)))
+            #if self.teleport_future.done():
+            #self.pen_future = self.pen.call(SetPen.Request(r = 255, g = 0, b = 0, width = 0.5, off = False))
+            #self.x = 
 
 
-        # self.get_logger().info("Killing turtle1")
-        # self.kill_future = self.kill.call_async(Kill.Request(name="turtle1"))
-        # self.turtle = Turtle.KILLING
+            self.total_dist += np.sqrt(self.diff_x**2 + self.diff_y**2)
+            i += 1
 
-        # #Calculate a new random position for the respawned turtle
-        # self.x_new = request.mixer.y + request.mixer.angular_velocity
-        # self.y_new = request.mixer.x * request.mixer.linear_velocity
-
-        # response.x = self.x_new
-        # response.y = self.y_new
-
+        response.total_dist = self.total_dist
         return response
+
+    """Timer function that runs at 100 Hz"""
+    def timer_callback(self):    
+        if self.state == State.MOVING:
+            """Send to debug logger that you are issuing a command as long as it is moving"""
+            self.get_logger().debug("Issuing Command!")
+            
+        elif self.state == State.RESET:
+            print("waiting")
+            if self.reset_future.done():
+                self.get_logger().info("Turtlesim Reset!")
+                self.state == State.MOVING
+                self.get_logger().info("Teleport turtle")
+                self.state = State.TELEPORT
+
+        #elif self.state == State.TELEPORT:
+            
 
 def main(args=None):
     """ The main() function. """
