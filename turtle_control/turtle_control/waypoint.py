@@ -1,5 +1,6 @@
 from cgitb import reset
 import re
+from telnetlib import TELNET_PORT
 from urllib import request
 from enum import Enum, auto
 import std_srvs
@@ -12,6 +13,7 @@ from geometry_msgs.msg import Twist
 from random import uniform
 from math import pi
 import numpy as np
+from time import sleep
 
 class State(Enum):
     """States of program"""
@@ -38,11 +40,12 @@ class Waypoint(Node):
         """Client for resetting the turtle in turtlesim"""
         self.reset = self.create_client(Empty, "reset")
         """Client for teleporting turtle in turtlesim"""
-        self.teleport = self.create_client(TeleportAbsolute, "TeleportAbsolute")
+        self.teleport = self.create_client(TeleportAbsolute, "turtle1/teleport_absolute")
         """Client for turtlesim pen to draw an X at each waypoint"""
-        self.pen = self.create_client(SetPen, "setpen")
+        self.pen = self.create_client(SetPen, "turtle1/set_pen")
         """Publish positions for turtle to move"""
        # self.move = self.create_publisher(Twist, "")
+        self.F1 = 0
 
        # if not self.reset.wait_for_service(timeout_sec=1.0):
        #     raise RuntimeError('Timeout waiting for "spawn" service to become available')
@@ -66,20 +69,16 @@ class Waypoint(Node):
             then the turtle moves to each waypoint and calculates the total linear distance traveled
         """
         self.state = State.RESET
-        self.points = request.points
         self.reset_future = self.reset.call_async(Empty.Request())
+
+        self.points = request.points
         i = 0
         self.total_dist = 0.0
-        while i < len(self.points):
+        print("waypoints")
+        while i < (len(self.points))-1:
             self.diff_x = self.points[i+1].x - self.points[i].x
             self.diff_y = self.points[i+1].y - self.points[i].y
-
             #teleport
-            #self.teleport_future = self.teleport.call(TeleportAbsolute.Request(x = self.points[i].x, y = self.points[i].y, theta = uniform(-pi, pi)))
-            #if self.teleport_future.done():
-            #self.pen_future = self.pen.call(SetPen.Request(r = 255, g = 0, b = 0, width = 0.5, off = False))
-            #self.x = 
-
 
             self.total_dist += np.sqrt(self.diff_x**2 + self.diff_y**2)
             i += 1
@@ -87,21 +86,41 @@ class Waypoint(Node):
         response.total_dist = self.total_dist
         return response
 
+
+    def draw_x(self, points):
+        i = 0
+        while i < (len(points))-1:
+            #self.pen_future = self.pen.call_async(SetPen.Request(r = 255, g = 0, b = 0, width = 1, off = True))
+            #if self.pen_future.done():
+            self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = self.points[i].x, y = self.points[i].y, theta = uniform(-pi, pi)))
+            i += 1
+            sleep(1)
+        self.get_logger().info("draw x") 
+        if self.teleport_future.done():
+        #self.pen_future = self.pen.call(SetPen.Request(r = 255, g = 0, b = 0, width = 0.5, off = False))
+        #self.x = 
+            print("teleporting")
+
     """Timer function that runs at 100 Hz"""
     def timer_callback(self):    
         if self.state == State.MOVING:
             """Send to debug logger that you are issuing a command as long as it is moving"""
             self.get_logger().debug("Issuing Command!")
-            
+        
         elif self.state == State.RESET:
-            print("waiting")
             if self.reset_future.done():
                 self.get_logger().info("Turtlesim Reset!")
                 self.state == State.MOVING
                 self.get_logger().info("Teleport turtle")
+                self.draw_x(self.points)
                 self.state = State.TELEPORT
 
-        #elif self.state == State.TELEPORT:
+        elif self.state == State.STOPPED:
+            self.state == State.RESET
+
+        elif self.state == State.TELEPORT:
+            if self.teleport_future.done():
+                print("done teleporting!")
             
 
 def main(args=None):
