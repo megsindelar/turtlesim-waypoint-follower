@@ -93,21 +93,17 @@ class Waypoint(Node):
             self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = self.points[i].x, y = self.points[i].y, theta = uniform(-pi, pi)))
             
             #draw x
-            # self.pen_future = self.pen.call_async(SetPen.Request(off = 0))
-            # self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.25), y = (self.points[i].y + 0.25)))
-            # self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.5), y = (self.points[i].y - 0.5)))
-            # self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.25), y = (self.points[i].y + 0.25)))
-            # self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.25), y = (self.points[i].y + 0.25)))
-            # self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.5), y = (self.points[i].y - 0.5)))
-            # self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.25), y = (self.points[i].y + 0.25)))
+            self.pen_future = self.pen.call_async(SetPen.Request(r = 255, width = 3, off = 0))
+            self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.25), y = (self.points[i].y + 0.25)))
+            self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.25), y = (self.points[i].y - 0.25)))
+            self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x), y = (self.points[i].y)))
+            self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.25), y = (self.points[i].y - 0.25)))
+            self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.25), y = (self.points[i].y + 0.25)))
             
             i += 1
             sleep(1)
-        self.get_logger().info("draw x") 
-        if self.teleport_future.done():
-        #self.pen_future = self.pen.call(SetPen.Request(r = 255, g = 0, b = 0, width = 0.5, off = False))
-        #self.x = 
-            print("teleporting")
+        
+        
 
     """Timer function that runs at 100 Hz"""
     def timer_callback(self):    
