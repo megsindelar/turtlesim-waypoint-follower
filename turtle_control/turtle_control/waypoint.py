@@ -30,7 +30,7 @@ class Waypoint(Node):
         """Initialize state to be stopping"""
         self.state = State.STOPPED
         """Declare a frequency parameter for timer callback"""
-        self.declare_parameter("frequency", 0.01)
+        self.declare_parameter("frequency", 100.0)
         self.frequency = self.get_parameter("frequency").get_parameter_value().double_value
         """Declare a tolerance parameter"""
         self.declare_parameter("tolerance",0.05)
@@ -40,7 +40,7 @@ class Waypoint(Node):
         """Create a service for turtle moving to different waypoints"""
         self.load = self.create_service(Waypoints, "load", self.load_callback)
         """Timer that runs at 100 Hz"""
-        self.timer = self.create_timer(self.frequency, self.timer_callback)
+        self.timer = self.create_timer((1/self.frequency), self.timer_callback)
         """Client for resetting the turtle in turtlesim"""
         self.reset = self.create_client(Empty, "reset")
         """Client for teleporting turtle in turtlesim"""

@@ -17,5 +17,8 @@ http://wiki.ros.org/turtlesim/Tutorials/Go%20to%20Goal
 
 https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html
 
+https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Recording-And-Playing-Back-Data/Recording-And-Playing-Back-Data.html
+
+
 
 # I worked with James Oubre, Liz Metzger, Nick Morales, Marno Nel, Sushma Chandra, Ritika Ghosh, Ava Zahade, Dilan Wijesinghe, David Dorf, and Rintaroh Shima

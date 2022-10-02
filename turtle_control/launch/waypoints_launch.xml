@@ -3,7 +3,7 @@
         <param from="$(find-pkg-share turtle_control)/colors.yaml"/>
    </node>
    <node pkg="turtle_control" exec="waypoint" name="waypoint">
-        <param name="frequency" value="0.01" />
+        <param name="frequency" value="100.0" />
         <param name="tolerance" value="0.05" />
    </node>
 </launch>

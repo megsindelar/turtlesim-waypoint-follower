@@ -1,0 +1,26 @@
+rosbag2_bagfile_information:
+  version: 5
+  storage_identifier: sqlite3
+  duration:
+    nanoseconds: 91539358415
+  starting_time:
+    nanoseconds_since_epoch: 1664746669472596797
+  message_count: 8553
+  topics_with_message_count:
+    - topic_metadata:
+        name: /turtle1/cmd_vel
+        type: geometry_msgs/msg/Twist
+        serialization_format: cdr
+        offered_qos_profiles: ""
+      message_count: 8553
+  compression_format: ""
+  compression_mode: ""
+  relative_file_paths:
+    - rosbag2_2022_10_02-16_37_49_0.db3
+  files:
+    - path: rosbag2_2022_10_02-16_37_49_0.db3
+      starting_time:
+        nanoseconds_since_epoch: 1664746669472596797
+      duration:
+        nanoseconds: 91539358415
+      message_count: 8553
