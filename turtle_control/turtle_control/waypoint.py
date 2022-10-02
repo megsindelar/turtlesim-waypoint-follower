@@ -162,22 +162,27 @@ class Waypoint(Node):
     def timer_callback(self):    
         if self.state == State.MOVING:
             """Send to debug logger that you are issuing a command as long as it is moving"""
-            self.get_logger().debug("Issuing Command!")
-            if len(self.points) > 1:
+            try:
+                self.get_logger().debug("Issuing Command!")
                 self.move_turtle()
-            else:
+            except:
+                self.get_logger().debug("Need to input waypoints first! Try again")
                 self.state = State.STOPPED
         
         elif self.state == State.RESET:
             if self.reset_future.done():
                 self.get_logger().info("Turtlesim Reset!")
-                if self.count < len(self.points):
-                    self.draw_x(self.count)
-                    self.count += 1
-                    #sleep(2)
-                else:
-                    print("teleport")
+                if len(self.points) > 1:
+                    if self.count < len(self.points):
+                        self.draw_x(self.count)
+                        self.count += 1
+                        #sleep(2)
+                    else:
+                        print("teleport")
                     self.state = State.TELEPORT
+                else:
+                    self.get_logger().debug("No waypoints! Try again!")
+                    self.state = State.STOPPED
 
         elif self.state == State.TELEPORT:
             print("hi")
