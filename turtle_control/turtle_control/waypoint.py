@@ -130,11 +130,18 @@ class Waypoint(Node):
         print(f"dtheta: {self.dtheta}")
 
         print(f"pose_theta: {self.pose.theta}")
-        if self.pose.theta < self.dtheta:
-            move = Twist(linear = Vector3(x = 1.0, y = 0.0, z = 0.0),
+        self.theta_diff = abs(self.pose.theta - self.dtheta)
+        if self.pose.theta < self.dtheta and self.theta_diff > 0.1:
+            move = Twist(linear = Vector3(x = 0.0, y = 0.0, z = 0.0),
                     angular = Vector3(x = 0.0, y = 0.0, z = 3.5))
-        else:
-            move = Twist(linear = Vector3(x = 1.0, y = 0.0, z = 0.0),
+        elif self.pose.theta < self.dtheta and self.theta_diff < 0.1:
+            move = Twist(linear = Vector3(x = 3.0, y = 0.0, z = 0.0),
+                    angular = Vector3(x = 0.0, y = 0.0, z = 3.5))
+        elif self.pose.theta > self.dtheta and self.theta_diff > 0.1:
+            move = Twist(linear = Vector3(x = 0.0, y = 0.0, z = 0.0),
+                    angular = Vector3(x = 0.0, y = 0.0, z = -3.5))
+        elif self.pose.theta > self.dtheta and self.theta_diff < 0.1:
+            move = Twist(linear = Vector3(x = 3.0, y = 0.0, z = 0.0),
                     angular = Vector3(x = 0.0, y = 0.0, z = -3.5))
         self.pub.publish(move)
 
