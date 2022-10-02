@@ -1,0 +1,3 @@
+turtlesim/Pose[] points    # use a strange formula to set the new location of the turtle
+---
+float64 total_dist          #total straight line distance the turtle traveled
