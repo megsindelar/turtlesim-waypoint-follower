@@ -112,7 +112,7 @@ class Waypoint(Node):
     def move_turtle(self):
         self.pen_future = self.pen.call_async(SetPen.Request(r = 255, g = 255, b = 255, width = 3, off = 0))
         print(self.pose)
-        self.dist = np.sqrt((self.points[1].x - self.pose.x)**2 + (self.points[1].y - self.pose.y)**2)
+        self.dist = np.sqrt((self.points[self.count2].x - self.pose.x)**2 + (self.points[self.count2].y - self.pose.y)**2)
         if self.count2 < len(self.points):
             if (self.dist > 0.05):
                 self.count2 = self.count2
@@ -122,8 +122,8 @@ class Waypoint(Node):
             print("done moving!")
             return 0
 
-        self.dx = self.points[1].x - self.pose.x
-        self.dy = self.points[1].y - self.pose.y
+        self.dx = self.points[self.count2].x - self.pose.x
+        self.dy = self.points[self.count2].y - self.pose.y
         
         self.dtheta = np.arctan2(self.dy,self.dx)
         print(f"dtheta: {self.dtheta}")
