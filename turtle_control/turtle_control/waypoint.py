@@ -104,6 +104,7 @@ class Waypoint(Node):
         self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x), y = (self.points[i].y)))
         self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.25), y = (self.points[i].y - 0.25)))
         self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.25), y = (self.points[i].y + 0.25)))
+        self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x), y = (self.points[i].y)))
         
         i += 1
         sleep(1)
@@ -130,11 +131,11 @@ class Waypoint(Node):
 
         print(f"pose_theta: {self.pose.theta}")
         if self.pose.theta < self.dtheta:
-            move = Twist(linear = Vector3(x = 0.7, y = 0.0, z = 0.0),
-                    angular = Vector3(x = 0.0, y = 0.0, z = 0.5))
+            move = Twist(linear = Vector3(x = 1.0, y = 0.0, z = 0.0),
+                    angular = Vector3(x = 0.0, y = 0.0, z = 3.5))
         else:
-            move = Twist(linear = Vector3(x = 0.7, y = 0.0, z = 0.0),
-                    angular = Vector3(x = 0.0, y = 0.0, z = -0.5))
+            move = Twist(linear = Vector3(x = 1.0, y = 0.0, z = 0.0),
+                    angular = Vector3(x = 0.0, y = 0.0, z = -3.5))
         self.pub.publish(move)
 
     def turtle_firstpt(self):
@@ -156,7 +157,7 @@ class Waypoint(Node):
                 if self.count < len(self.points):
                     self.draw_x(self.count)
                     self.count += 1
-                    sleep(2)
+                    #sleep(2)
                 else:
                     print("teleport")
                     self.state = State.TELEPORT
