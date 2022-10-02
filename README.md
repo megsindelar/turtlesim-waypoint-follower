@@ -23,4 +23,4 @@ https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Recording-And-Playin
 
 
 
-# I worked with James Oubre, Liz Metzger, Nick Morales, Marno Nel, Sushma Chandra, Ritika Ghosh, Ava Zahade, Dilan Wijesinghe, David Dorf, and Rintaroh Shima
+# I worked with James Oubre, Liz Metzger, Nick Morales, Marno Nel, Katie Hughes, Sushma Chandra, Ritika Ghosh, Ava Zahade, Dilan Wijesinghe, David Dorf, and Rintaroh Shima
