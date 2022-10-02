@@ -9,7 +9,8 @@ import rclpy
 from rclpy.node import Node
 from turtlesim.srv import TeleportAbsolute, SetPen
 from turtle_interfaces.srv import Waypoints
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Vector3
+from turtlesim.msg import Pose
 from random import uniform
 from math import pi
 import numpy as np
@@ -44,11 +45,16 @@ class Waypoint(Node):
         """Client for turtlesim pen to draw an X at each waypoint"""
         self.pen = self.create_client(SetPen, "turtle1/set_pen")
         """Publish positions for turtle to move"""
-       # self.move = self.create_publisher(Twist, "")
+        self.pub = self.create_publisher(Twist, "turtle1/cmd_vel", 10)
+        """Subscriber to current turtle position"""
+        self.sub = self.create_subscription(Pose, "turtle1/pose", self.turtle_pose_callback, 10)
+        self.count = 0
+        """Count variable for keeping track of indices for moving turtle"""
+        self.count2 = 1
 
-       # if not self.reset.wait_for_service(timeout_sec=1.0):
-       #     raise RuntimeError('Timeout waiting for "spawn" service to become available')
 
+    def turtle_pose_callback(self, msg):
+        self.pose = msg
 
     """Service callback function for toggling states"""
     def toggle_callback(self, request, response):
@@ -86,45 +92,82 @@ class Waypoint(Node):
         return response
 
 
-    def draw_x(self, points):
-        i = 0
-        while i < (len(points))-1:
-            self.pen_future = self.pen.call_async(SetPen.Request(off = 1))
-            self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = self.points[i].x, y = self.points[i].y, theta = uniform(-pi, pi)))
-            
-            #draw x
-            self.pen_future = self.pen.call_async(SetPen.Request(r = 255, width = 3, off = 0))
-            self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.25), y = (self.points[i].y + 0.25)))
-            self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.25), y = (self.points[i].y - 0.25)))
-            self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x), y = (self.points[i].y)))
-            self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.25), y = (self.points[i].y - 0.25)))
-            self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.25), y = (self.points[i].y + 0.25)))
-            
-            i += 1
-            sleep(1)
+    def draw_x(self,i):
+        #while i < len(self.points):
+        self.pen_future = self.pen.call_async(SetPen.Request(off = 1))
+        self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = self.points[i].x, y = self.points[i].y, theta = uniform(-pi, pi)))
+        
+        #draw x
+        self.pen_future = self.pen.call_async(SetPen.Request(r = 255, g = 170, b = 175, width = 3, off = 0))
+        self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.25), y = (self.points[i].y + 0.25)))
+        self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.25), y = (self.points[i].y - 0.25)))
+        self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x), y = (self.points[i].y)))
+        self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.25), y = (self.points[i].y - 0.25)))
+        self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.25), y = (self.points[i].y + 0.25)))
+        
+        i += 1
+        sleep(1)
         
         
+    def move_turtle(self):
+        self.pen_future = self.pen.call_async(SetPen.Request(r = 255, g = 255, b = 255, width = 3, off = 0))
+        print(self.pose)
+        self.dist = np.sqrt((self.points[1].x - self.pose.x)**2 + (self.points[1].y - self.pose.y)**2)
+        if self.count2 < len(self.points):
+            if (self.dist > 0.05):
+                self.count2 = self.count2
+            else:
+                self.count2 += 1
+        else:
+            print("done moving!")
+            return 0
+
+        self.dx = self.points[1].x - self.pose.x
+        self.dy = self.points[1].y - self.pose.y
+        
+        self.dtheta = np.arctan2(self.dy,self.dx)
+        print(f"dtheta: {self.dtheta}")
+
+        print(f"pose_theta: {self.pose.theta}")
+        if self.pose.theta < self.dtheta:
+            move = Twist(linear = Vector3(x = 0.7, y = 0.0, z = 0.0),
+                    angular = Vector3(x = 0.0, y = 0.0, z = 0.5))
+        else:
+            move = Twist(linear = Vector3(x = 0.7, y = 0.0, z = 0.0),
+                    angular = Vector3(x = 0.0, y = 0.0, z = -0.5))
+        self.pub.publish(move)
+
+    def turtle_firstpt(self):
+        self.pen_future = self.pen.call_async(SetPen.Request(off = 1))
+        self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = self.points[0].x, y = self.points[0].y, theta = uniform(-pi, pi)))
+
 
     """Timer function that runs at 100 Hz"""
     def timer_callback(self):    
         if self.state == State.MOVING:
             """Send to debug logger that you are issuing a command as long as it is moving"""
             self.get_logger().debug("Issuing Command!")
+            self.move_turtle()
+            #self.state = State.STOPPED
         
         elif self.state == State.RESET:
             if self.reset_future.done():
                 self.get_logger().info("Turtlesim Reset!")
-                self.state == State.MOVING
-                self.get_logger().info("Teleport turtle")
-                self.draw_x(self.points)
-                self.state = State.TELEPORT
-
-        elif self.state == State.STOPPED:
-            self.state == State.RESET
+                if self.count < len(self.points):
+                    self.draw_x(self.count)
+                    self.count += 1
+                    sleep(2)
+                else:
+                    print("teleport")
+                    self.state = State.TELEPORT
 
         elif self.state == State.TELEPORT:
-            if self.teleport_future.done():
-                print("done teleporting!")
+            print("hi")
+            self.turtle_firstpt()
+            #if self.teleport_future.done():
+            #    self.state = State.MOVING
+            self.state = State.STOPPED
+            print(self.state)
             
 
 def main(args=None):
