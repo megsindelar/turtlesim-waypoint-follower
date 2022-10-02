@@ -192,7 +192,12 @@ class Waypoint(Node):
             #    self.state = State.MOVING
             self.state = State.STOPPED
             print(self.state)
-            
+        
+        elif self.state == State.STOPPED:
+            move = Twist(linear = Vector3(x = 0.0, y = 0.0, z = 0.0),
+                    angular = Vector3(x = 0.0, y = 0.0, z = 0.0))
+            self.pub.publish(move)
+
 
 def main(args=None):
     """ The main() function. """
