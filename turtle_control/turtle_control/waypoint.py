@@ -100,7 +100,7 @@ class Waypoint(Node):
         #while i < len(self.points):
         self.pen_future = self.pen.call_async(SetPen.Request(off = 1))
         self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = self.points[i].x, y = self.points[i].y, theta = uniform(-pi, pi)))
-        
+        print("hello")
         #draw x
         self.pen_future = self.pen.call_async(SetPen.Request(r = 255, g = 170, b = 175, width = 3, off = 0))
         self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x + 0.25), y = (self.points[i].y + 0.25)))
@@ -172,14 +172,15 @@ class Waypoint(Node):
         elif self.state == State.RESET:
             if self.reset_future.done():
                 self.get_logger().info("Turtlesim Reset!")
-                if len(self.points) > 1:
+                if len(self.points) >= 1:
+                    print(self.points)
                     if self.count < len(self.points):
                         self.draw_x(self.count)
                         self.count += 1
                         #sleep(2)
                     else:
                         print("teleport")
-                    self.state = State.TELEPORT
+                        self.state = State.TELEPORT
                 else:
                     self.get_logger().debug("No waypoints! Try again!")
                     self.state = State.STOPPED
