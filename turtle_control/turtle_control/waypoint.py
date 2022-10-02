@@ -32,6 +32,9 @@ class Waypoint(Node):
         """Declare a frequency parameter for timer callback"""
         self.declare_parameter("frequency", 0.01)
         self.frequency = self.get_parameter("frequency").get_parameter_value().double_value
+        """Declare a tolerance parameter"""
+        self.declare_parameter("tolerance",0.05)
+        self.tolerance = self.get_parameter("tolerance").get_parameter_value().double_value
         """Create a service to toggle states"""
         self.toggle = self.create_service(Empty, "toggle", self.toggle_callback)
         """Create a service for turtle moving to different waypoints"""
@@ -53,8 +56,9 @@ class Waypoint(Node):
         self.count2 = 1
 
 
-    def turtle_pose_callback(self, msg):
+    def turtle_pose_callback(self, msg):    #referenced http://wiki.ros.org/turtlesim/Tutorials/Go%20to%20Goal to create subsriber callback
         self.pose = msg
+        self.get_logger().debug(f"Subsciber data: {self.pose}")
 
     """Service callback function for toggling states"""
     def toggle_callback(self, request, response):
@@ -114,35 +118,39 @@ class Waypoint(Node):
         self.pen_future = self.pen.call_async(SetPen.Request(r = 255, g = 255, b = 255, width = 3, off = 0))
         print(self.pose)
         self.dist = np.sqrt((self.points[self.count2].x - self.pose.x)**2 + (self.points[self.count2].y - self.pose.y)**2)
-        if self.count2 < len(self.points):
-            if (self.dist > 0.05):
-                self.count2 = self.count2
-            else:
-                self.count2 += 1
+        if (self.dist > self.tolerance):
+            self.count2 = self.count2
+        elif self.count2 == (len(self.points) - 1):
+            self.count2 = 0
         else:
-            print("done moving!")
-            return 0
+            self.count2 += 1
+
+        print(f"count: ", self.count2)
 
         self.dx = self.points[self.count2].x - self.pose.x
         self.dy = self.points[self.count2].y - self.pose.y
+        print(f"dx: {self.dx}")
+        print(f"dy: {self.dy}")
         
-        self.dtheta = np.arctan2(self.dy,self.dx)
+        self.dtheta = np.arctan2(self.dy, self.dx)
         print(f"dtheta: {self.dtheta}")
 
         print(f"pose_theta: {self.pose.theta}")
         self.theta_diff = abs(self.pose.theta - self.dtheta)
+        print(f"diff {self.theta_diff}")
+
         if self.pose.theta < self.dtheta and self.theta_diff > 0.1:
             move = Twist(linear = Vector3(x = 0.0, y = 0.0, z = 0.0),
-                    angular = Vector3(x = 0.0, y = 0.0, z = 3.5))
+                    angular = Vector3(x = 0.0, y = 0.0, z = 1.0))
         elif self.pose.theta < self.dtheta and self.theta_diff < 0.1:
-            move = Twist(linear = Vector3(x = 3.0, y = 0.0, z = 0.0),
-                    angular = Vector3(x = 0.0, y = 0.0, z = 3.5))
+            move = Twist(linear = Vector3(x = 2.0, y = 0.0, z = 0.0),
+                    angular = Vector3(x = 0.0, y = 0.0, z = 1.5))
         elif self.pose.theta > self.dtheta and self.theta_diff > 0.1:
             move = Twist(linear = Vector3(x = 0.0, y = 0.0, z = 0.0),
-                    angular = Vector3(x = 0.0, y = 0.0, z = -3.5))
+                    angular = Vector3(x = 0.0, y = 0.0, z = -1.0))
         elif self.pose.theta > self.dtheta and self.theta_diff < 0.1:
-            move = Twist(linear = Vector3(x = 3.0, y = 0.0, z = 0.0),
-                    angular = Vector3(x = 0.0, y = 0.0, z = -3.5))
+            move = Twist(linear = Vector3(x = 2.0, y = 0.0, z = 0.0),
+                    angular = Vector3(x = 0.0, y = 0.0, z = -1.5))
         self.pub.publish(move)
 
     def turtle_firstpt(self):
@@ -155,8 +163,10 @@ class Waypoint(Node):
         if self.state == State.MOVING:
             """Send to debug logger that you are issuing a command as long as it is moving"""
             self.get_logger().debug("Issuing Command!")
-            self.move_turtle()
-            #self.state = State.STOPPED
+            if len(self.points) > 1:
+                self.move_turtle()
+            else:
+                self.state = State.STOPPED
         
         elif self.state == State.RESET:
             if self.reset_future.done():
