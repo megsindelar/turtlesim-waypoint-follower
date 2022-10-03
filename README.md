@@ -3,7 +3,8 @@
 
 
 Screen Recording of Turtle Moving...
-[Alt Text](https://github.com/ME495-EmbeddedSystems/homework1-megsindelar/issues/1#issue-1393914563)
+
+[MeganSindelar_HW1_rosbag_record.webm](https://user-images.githubusercontent.com/87098227/193615353-f9150012-2783-4ae8-87ed-916064298e5d.webm)
 
 
 
