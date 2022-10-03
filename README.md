@@ -4,7 +4,7 @@
 
 Screen Recording of Turtle Moving...
 
-[MeganSindelar_HW1_rosbag_record.webm](https://user-images.githubusercontent.com/87098227/193615353-f9150012-2783-4ae8-87ed-916064298e5d.webm)
+[Screencast from 10-03-2022 10:39:58 AM.webm](https://user-images.githubusercontent.com/87098227/193619748-2e285f14-ea01-47fa-95f8-456b9c8b1225.webm)
 
 
 
@@ -25,3 +25,5 @@ https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Recording-And-Playin
 
 
 # I worked with James Oubre, Liz Metzger, Nick Morales, Marno Nel, Katie Hughes, Sushma Chandra, Ritika Ghosh, Ava Zahade, Dilan Wijesinghe, David Dorf, and Rintaroh Shima
+
+ros2 service call /load turtle_interfaces/srv/Waypoints "points: [{x: 1.7, y: 1.7},{x: 2.3, y: 9.5},{x: 7.3, y: 6},{x: 4.3, y: 2.5},{x: 8.3, y: 1.4},{x: 4.3, y: 5.2}]" 
