@@ -84,8 +84,9 @@ class Waypoint(Node):
 
             Returns:
                 no returns
+
+            referenced http://wiki.ros.org/turtlesim/Tutorials/Go%20to%20Goal to create subsriber callback
         """ 
-        #referenced http://wiki.ros.org/turtlesim/Tutorials/Go%20to%20Goal to create subsriber callback
         self.pose = msg
         self.get_logger().debug(f"Subsciber data: {self.pose}")
 
@@ -95,7 +96,7 @@ class Waypoint(Node):
 
             Toggles between turtle moving and stopping states
 
-            Args: 
+            Args:
                 request (EmptyRequest): no data
              
                 response (EmptyResponse): no data
@@ -147,6 +148,7 @@ class Waypoint(Node):
             i += 1
 
         response.total_dist = self.total_dist
+
         return response
 
 
@@ -172,7 +174,8 @@ class Waypoint(Node):
         self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x - 0.25), y = (self.points[i].y + 0.25)))
         self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x), y = (self.points[i].y)))
         
-        i += 1        
+        i += 1      
+        sleep(1)  
         
 
     def move_turtle(self):
