@@ -271,9 +271,6 @@ class Waypoint(Node):
                     angular = Vector3(x = 0.0, y = 0.0, z = 0.0))
             self.pub.publish(move)
 
-        else:
-            raise RuntimeException("Invalid State")
-
 
 def main(args=None):
     """ The main function"""
