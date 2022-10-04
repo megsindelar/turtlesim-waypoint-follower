@@ -175,8 +175,7 @@ class Waypoint(Node):
         self.teleport_future = self.teleport.call_async(TeleportAbsolute.Request(x = (self.points[i].x), y = (self.points[i].y)))
         
         i += 1      
-        sleep(1)  
-        
+        sleep(1)      
 
     def move_turtle(self):
         """ Function to move the turtle in a looping path to each waypoint
